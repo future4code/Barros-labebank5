@@ -4,5 +4,11 @@ export type Conta={
     cpf: string,
     dataNasc: string,
     saldo: number,
-    extratos: number[]
+    extratos: Extrato[]
+}
+
+export type Extrato={
+    valor:number,
+    data:string,
+    descricao:string
 }
