@@ -49,6 +49,44 @@ app.post("/users/newUser",(req:Request, res: Response)=>{
     }
 })
 
+// ---------------- ADICIONAR SALDO
+app.put('/users/addSaldo',(req:Request, res: Response)=>{
+    try{
+        const nome = req.headers.nome 
+        const cpf= req.headers.cpf
+        const addSaldo = req.body.saldo
+        
+        if( !nome ){
+            const erro=new Error("Nome não informado!");
+            erro.name="nomeNaoInformado";
+            throw erro;
+        }
+        if( !cpf ){
+            const erro=new Error('CPF não informado')
+            erro.name="cpfNaoInformado"
+            throw erro
+        }
+        if( !addSaldo ){
+            const erro=new Error('Saldo não informado')
+            erro.name="saldoNaoInformado"
+            throw erro
+        }
+
+        const buscaUser = data.client.filter((i)=>{
+            if(cpf === i.cpf){
+                let nSaldo = i.saldo + addSaldo
+                i.saldo = nSaldo
+            }
+        })
+        
+        res.status(200).send(data.client);
+
+    }catch(erro:any){
+        res.status(400).send(erro.message);
+    }
+})
+
+
 app.listen(3003, () => {
     console.log("Server is running in http://localhost:3003");
 });
