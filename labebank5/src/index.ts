@@ -86,6 +86,34 @@ app.put('/users/addSaldo',(req:Request, res: Response)=>{
     }
 })
 
+//ver saldo
+
+app.get('/users/verSaldo', (req:Request, res: Response) =>{
+    try {
+        const nome = req.headers.nome 
+        const cpf= req.headers.cpf
+        if(!nome){
+            const erro=new Error("Nome não informado!")
+            erro.name="nomeNaoInformado";
+            throw erro;
+        }
+        if(!cpf){
+            const erro=new Error('CPF não informado')
+            erro.name="cpfNaoInformado"
+            throw erro
+        }
+        const buscaUser = data.client.filter((i)=>{
+            if(cpf === i.cpf){
+                return i.saldo
+            }
+        })
+        res.status(200).send(buscaUser);
+    }
+    catch(erro:any){
+        res.status(400).send(erro.message);
+    }
+
+})
 
 app.listen(3003, () => {
     console.log("Server is running in http://localhost:3003");
