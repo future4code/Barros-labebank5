@@ -87,7 +87,6 @@ app.put('/users/addSaldo',(req:Request, res: Response)=>{
 })
 
 //ver saldo
-
 app.get('/users/verSaldo', (req:Request, res: Response) =>{
     try {
         const nome = req.headers.nome 
@@ -107,13 +106,78 @@ app.get('/users/verSaldo', (req:Request, res: Response) =>{
                 return i.saldo
             }
         })
-        res.status(200).send(buscaUser);
+        const verSaldo = buscaUser.map((saldo)=>{
+            return saldo.saldo
+        })
+        res.status(200).send(verSaldo);
+
     }
     catch(erro:any){
         res.status(400).send(erro.message);
     }
-
 })
+
+// -------------------TRANSFERÊNCIA INTERNA
+app.put('/users/transferencia',(req:Request, res: Response)=>{
+    try{
+        const nomeRemetente = req.headers.nome 
+        const cpfRemetente = req.headers.cpf
+        const nomeDestinatario = req.body.nomeDestinatario
+        const cpfDestinatario = req.body.cpfDestinatario
+        const valorTransferencia = req.body.valorTransferencia
+
+        if( !nomeRemetente ){
+            const erro=new Error("Nome do remetente não informado!");
+            erro.name="nomeNaoInformado";
+            throw erro;
+        }
+        if( !cpfRemetente ){
+            const erro=new Error("CPF do remetente não informado!");
+            erro.name="cpfNaoInformado";
+            throw erro;
+        }
+        if( !nomeDestinatario ){
+            const erro=new Error("Nome do destinatário não informado!");
+            erro.name="nomeDestinatarioNaoInformado";
+            throw erro;
+        }
+        if( !cpfDestinatario ){
+            const erro=new Error("CPF do destinatário não informado!");
+            erro.name="cpfDestinatarioNaoInformado";
+            throw erro;
+        }
+        if( !valorTransferencia ){
+            const erro=new Error("Valor não informado!");
+            erro.name="valorNaoInformado";
+            throw erro;
+        }
+
+        const buscaRemetente = data.client.filter((i)=>{
+            return cpfRemetente === i.cpf
+        })
+        const buscaDestinatario = data.client.filter((i)=>{
+            return cpfDestinatario === i.cpf
+        })
+        const t = buscaRemetente.map((i)=>{
+            if(valorTransferencia < i.saldo){
+                const transferencia = buscaDestinatario.map((i)=>{
+                    let nSaldo = i.saldo + valorTransferencia
+                    i.saldo = nSaldo
+                })
+                i.saldo - valorTransferencia
+            }else{
+                const erro=new Error("Saldo insuficiente!");
+                erro.name="saldoInsuficiente";
+                throw erro;
+            }
+        })
+        res.status(200).send(data.client)
+        
+    }catch(erro:any){
+        res.status(400).send(erro.message);
+    }
+})
+
 
 app.listen(3003, () => {
     console.log("Server is running in http://localhost:3003");
