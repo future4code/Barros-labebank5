@@ -49,6 +49,46 @@ app.post("/users/newUser",(req:Request, res: Response)=>{
     }
 })
 
+//--------------------CONTA A PAGAR
+
+app.post("/users/account/pay",(req:Request, res: Response)=>{
+    let errCode = 400
+     try {
+         const {valor,dataPagamento,descricao,cpf} = req.body
+        
+         if (!descricao||!valor||!cpf) {
+             errCode = 402
+             throw new Error("Verification params body, data, descricao, valor and cpf")
+         }
+           const cpfValidity = validarCpf(cpf); 
+         if (!cpfValidity) {
+             errCode = 402
+             throw new Error("Verification params cpf is not valid")
+         } 
+         const existUser = data.client.find((user)=> user.cpf === cpf) 
+         if (!existUser) {
+             errCode = 402
+             throw new Error("User already not exist")
+         }
+         const balanceCompare = func.validiBalance(data.client,cpf,valor)
+        if(balanceCompare){
+             errCode = 402
+             throw new Error("insufficient balance.")
+         }
+         const isValidiDate = func.validiDate(dataPagamento)
+         if(!isValidiDate&&dataPagamento !== ""){
+             errCode = 402
+             throw new Error("data pagamento is not valid")
+         }
+         
+         const addPayAccount = func.addAccountPay(data.client,dataPagamento, descricao, valor,cpf)
+         res.status(200).send(addPayAccount);
+ 
+     } catch (error:any) {
+         res.status(errCode).send(error.message)
+     }
+ })
+
 // ---------------- ADICIONAR SALDO
 app.put('/users/addSaldo',(req:Request, res: Response)=>{
     try{
