@@ -18,6 +18,7 @@ app.get("/users",(req:Request, res: Response)=>{
     res.send(data.client)
 })
 
+//------------------ NOVO USUÁRIO
 app.post("/users/newUser",(req:Request, res: Response)=>{
     let errCode = 400
     try {
@@ -86,7 +87,7 @@ app.put('/users/addSaldo',(req:Request, res: Response)=>{
     }
 })
 
-//ver saldo
+//------------------- VER SALDO
 app.get('/users/verSaldo', (req:Request, res: Response) =>{
     try {
         const nome = req.headers.nome 
