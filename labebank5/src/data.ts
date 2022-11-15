@@ -36,6 +36,18 @@ export let client:Conta[] = [
             {valor: 60, data: "2022-10-30", descricao: "Compra2"}, 
             {valor: 6000, data: "2022-11-08", descricao: "Compra3"}, 
          ],
+    },
+    { 
+        id: 4,
+        nome: "Jhonny",
+        cpf: "468.458.309-08",
+        dataNasc: "1983-09-20",
+        saldo: 8500,
+        extratos:[ 
+            {valor: 800, data: "2022-10-14", descricao: "Compra1"}, 
+            {valor: 60, data: "2022-10-30", descricao: "Compra2"}, 
+            {valor: 6000, data: "2022-11-08", descricao: "Compra3"}, 
+         ],
     }
 
 ]
