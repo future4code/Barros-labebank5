@@ -126,21 +126,35 @@ app.put('/users/addSaldo',(req:Request, res: Response)=>{
     }
 })
 
-//ver saldo
+//------------------ VER Saldo
 app.get('/users/verSaldo', (req:Request, res: Response) =>{
     try {
         const nome = req.headers.nome 
-        const cpf= req.headers.cpf
+        const cpf = req.headers.cpf
+
         if(!nome){
             const erro=new Error("Nome não informado!")
             erro.name="nomeNaoInformado";
             throw erro;
         }
+
         if(!cpf){
             const erro=new Error('CPF não informado')
             erro.name="cpfNaoInformado"
             throw erro
         }
+        
+        const existUser = data.client.find((user)=> {
+           return user.cpf === cpf
+            
+        })
+
+        if(!existUser){
+            const erro=new Error('Usuário não existe')
+            erro.name="cpfInvalido"
+            throw erro
+        }
+        
         const buscaUser = data.client.filter((i)=>{
             if(cpf === i.cpf){
                 return i.saldo
@@ -218,6 +232,58 @@ app.put('/users/transferencia',(req:Request, res: Response)=>{
     }
 })
 
+//---------------- SALDO ATUALIZADO
+app.put('/users/atualizaSaldo', (req:Request, res: Response) => {
+    try {
+        const nome = req.params.nome
+        const cpf = req.headers.cpf
+
+        if(!cpf){
+            const erro=new Error("CPF não informado!");
+            erro.name="cpfNaoInformado";
+            throw erro;
+        }
+
+        const existUser = data.client.find((user)=> {
+            return user.cpf === cpf
+             
+         })
+ 
+         if(!existUser){
+             const erro=new Error('Usuário não existe')
+             erro.name="cpfInvalido"
+             throw erro
+         }
+         
+        const buscaUser = data.client.filter((i)=>{
+           return i.cpf === cpf
+        })
+        console.log(cpf);
+        
+        const validiDateExtract = (dateAccount:any):boolean=>{
+            let parts = dateAccount.split('-')
+            let today = new Date()
+            dateAccount = new Date(parts[0], parts[1] - 1, parts[2])
+            return dateAccount <= today ? true : false
+        }
+
+        let soma = 0
+        for (let i = 0; i < buscaUser[0].extratos.length; i++) {
+            const dataValida = validiDateExtract(buscaUser[0].extratos[i].data)
+            if(dataValida){
+                soma += buscaUser[0].extratos[i].valor;
+            }
+        }
+
+        buscaUser[0].saldo = buscaUser[0].saldo - soma
+
+        res.status(200).send(buscaUser)
+
+    }
+    catch(erro:any){
+        res.status(400).send(erro.message);
+    }
+})
 
 app.listen(3003, () => {
     console.log("Server is running in http://localhost:3003");

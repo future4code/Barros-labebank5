@@ -8,7 +8,7 @@ export let client:Conta[] = [
         dataNasc: "2001-08-05",
         saldo: 200,
         extratos:[ 
-            {valor: 200, data: "2022-08-14", descricao: "Compra1"}, 
+            {valor: 200, data: "2022-12-14", descricao: "Compra1"}, 
             {valor: 500, data: "2022-11-01", descricao: "Compra2"}, 
             {valor: 300, data: "2022-11-05", descricao: "Compra3"}, 
         ],
