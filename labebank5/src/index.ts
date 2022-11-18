@@ -145,13 +145,15 @@ app.get('/users/verSaldo', (req:Request, res: Response) =>{
         }
         
         const existUser = data.client.find((user)=> {
-            user.cpf === cpf
-            if(!existUser){
-                const erro=new Error('Usuário não existe')
-                erro.name="cpfInvalido"
-                throw erro
-            }
+           return user.cpf === cpf
+            
         })
+
+        if(!existUser){
+            const erro=new Error('Usuário não existe')
+            erro.name="cpfInvalido"
+            throw erro
+        }
         
         const buscaUser = data.client.filter((i)=>{
             if(cpf === i.cpf){
@@ -241,6 +243,14 @@ app.put('/users/atualizaSaldo', (req:Request, res: Response) => {
                 return i.saldo
             }
         })
+
+        let soma = 0
+        for (let i = 0; i < buscaUser[0].extratos.length; i++) {
+            soma += buscaUser[0].extratos[i].valor;
+        }
+
+        
+
 
     }
     catch(erro:any){
