@@ -236,21 +236,48 @@ app.put('/users/transferencia',(req:Request, res: Response)=>{
 app.put('/users/atualizaSaldo', (req:Request, res: Response) => {
     try {
         const nome = req.params.nome
-        const cpf = req.params.cpf
+        const cpf = req.headers.cpf
 
+        if(!cpf){
+            const erro=new Error("CPF não informado!");
+            erro.name="cpfNaoInformado";
+            throw erro;
+        }
+
+        const existUser = data.client.find((user)=> {
+            return user.cpf === cpf
+             
+         })
+ 
+         if(!existUser){
+             const erro=new Error('Usuário não existe')
+             erro.name="cpfInvalido"
+             throw erro
+         }
+         
         const buscaUser = data.client.filter((i)=>{
-            if(cpf === i.cpf){
-                return i.saldo
-            }
+           return i.cpf === cpf
         })
+        console.log(cpf);
+        
+        const validiDateExtract = (dateAccount:any):boolean=>{
+            let parts = dateAccount.split('-')
+            let today = new Date()
+            dateAccount = new Date(parts[0], parts[1] - 1, parts[2])
+            return dateAccount <= today ? true : false
+        }
 
         let soma = 0
         for (let i = 0; i < buscaUser[0].extratos.length; i++) {
-            soma += buscaUser[0].extratos[i].valor;
+            const dataValida = validiDateExtract(buscaUser[0].extratos[i].data)
+            if(dataValida){
+                soma += buscaUser[0].extratos[i].valor;
+            }
         }
 
-        
+        buscaUser[0].saldo = buscaUser[0].saldo - soma
 
+        res.status(200).send(buscaUser)
 
     }
     catch(erro:any){
