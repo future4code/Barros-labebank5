@@ -81,7 +81,7 @@ app.post("/users/account/pay",(req:Request, res: Response)=>{
              throw new Error("data pagamento is not valid")
          }
          
-         const addPayAccount = func.addAccountPay(data.client,dataPagamento, descricao, valor,cpf)
+         const addPayAccount = func.addMovementAccount(data.client,dataPagamento, descricao, valor,cpf)
          res.status(200).send(addPayAccount);
  
      } catch (error:any) {
@@ -95,7 +95,7 @@ app.put('/users/addSaldo',(req:Request, res: Response)=>{
         const nome = req.headers.nome 
         const cpf= req.headers.cpf
         const addSaldo = req.body.saldo
-        
+        let dataDeposito:string="";
         if( !nome ){
             const erro=new Error("Nome não informado!");
             erro.name="nomeNaoInformado";
@@ -112,6 +112,8 @@ app.put('/users/addSaldo',(req:Request, res: Response)=>{
             throw erro
         }
 
+        const addPayAccount = func.addMovementAccount(data.client,dataDeposito, "Deposito de dinheiro", addSaldo,cpf.toString())
+        
         const buscaUser = data.client.filter((i)=>{
             if(cpf === i.cpf){
                 let nSaldo = i.saldo + addSaldo

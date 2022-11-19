@@ -15,7 +15,7 @@ export const addUser = (client: types.Conta[], nome: string, cpf: string, dataNa
   });
   return newUser;
 };
-export const addAccountPay = (client:types.Conta[], data:string, descricao:string,valor:number,cpf:string):types.Conta[]=>{
+export const addMovementAccount = (client:types.Conta[], data:string, descricao:string,valor:number,cpf:string):types.Conta[]=>{
   const newAccount  = [...client];
   if(!data){
     data = formatDate();
