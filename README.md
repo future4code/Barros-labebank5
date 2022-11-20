@@ -12,4 +12,7 @@ Express, Typescript
 ## Endpoints:
 GET, POST, PUT
 
+## Documentação API:
+https://documenter.getpostman.com/view/22363157/2s8YmSsLQt
+
 ## Exemplificação:
