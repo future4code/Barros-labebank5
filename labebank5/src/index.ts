@@ -18,6 +18,52 @@ app.get("/users",(req:Request, res: Response)=>{
     res.send(data.client)
 })
 
+//------------------ VER Saldo
+app.get('/users/verSaldo', (req:Request, res: Response) =>{
+    try {
+        const nome = req.headers.nome 
+        const cpf = req.headers.cpf
+
+        if(!nome){
+            const erro=new Error("Nome não informado!")
+            erro.name="nomeNaoInformado";
+            throw erro;
+        }
+
+        if(!cpf){
+            const erro=new Error('CPF não informado')
+            erro.name="cpfNaoInformado"
+            throw erro
+        }
+        
+        const existUser = data.client.find((user)=> {
+           return user.cpf === cpf
+            
+        })
+
+        if(!existUser){
+            const erro=new Error('Usuário não existe')
+            erro.name="cpfInvalido"
+            throw erro
+        }
+        
+        const buscaUser = data.client.filter((i)=>{
+            if(cpf === i.cpf){
+                return i.saldo
+            }
+        })
+        const verSaldo = buscaUser.map((saldo)=>{
+            return saldo.saldo
+        })
+        res.status(200).send(verSaldo);
+
+    }
+    catch(erro:any){
+        res.status(400).send(erro.message);
+    }
+})
+
+//--------------ADD USUARIOS---------
 app.post("/users/newUser",(req:Request, res: Response)=>{
     let errCode = 400
     try {
@@ -128,59 +174,16 @@ app.put('/users/addSaldo',(req:Request, res: Response)=>{
     }
 })
 
-//------------------ VER Saldo
-app.get('/users/verSaldo', (req:Request, res: Response) =>{
-    try {
-        const nome = req.headers.nome 
-        const cpf = req.headers.cpf
-
-        if(!nome){
-            const erro=new Error("Nome não informado!")
-            erro.name="nomeNaoInformado";
-            throw erro;
-        }
-
-        if(!cpf){
-            const erro=new Error('CPF não informado')
-            erro.name="cpfNaoInformado"
-            throw erro
-        }
-        
-        const existUser = data.client.find((user)=> {
-           return user.cpf === cpf
-            
-        })
-
-        if(!existUser){
-            const erro=new Error('Usuário não existe')
-            erro.name="cpfInvalido"
-            throw erro
-        }
-        
-        const buscaUser = data.client.filter((i)=>{
-            if(cpf === i.cpf){
-                return i.saldo
-            }
-        })
-        const verSaldo = buscaUser.map((saldo)=>{
-            return saldo.saldo
-        })
-        res.status(200).send(verSaldo);
-
-    }
-    catch(erro:any){
-        res.status(400).send(erro.message);
-    }
-})
-
 // -------------------TRANSFERÊNCIA INTERNA
 app.put('/users/transferencia',(req:Request, res: Response)=>{
+    let errCode = 400;
     try{
         const nomeRemetente = req.headers.nome 
         const cpfRemetente = req.headers.cpf
         const nomeDestinatario = req.body.nomeDestinatario
         const cpfDestinatario = req.body.cpfDestinatario
         const valorTransferencia = req.body.valorTransferencia
+        const dataTransferencia:string = ""
 
         if( !nomeRemetente ){
             const erro=new Error("Nome do remetente não informado!");
@@ -207,7 +210,16 @@ app.put('/users/transferencia',(req:Request, res: Response)=>{
             erro.name="valorNaoInformado";
             throw erro;
         }
-
+        const existUser = data.client.find((user)=> user.cpf === cpfRemetente)
+        if(!existUser){
+            errCode = 402
+            throw new Error(" User sender not found!");
+        }
+        const existUserDestinatario = data.client.find((user)=> user.cpf ===cpfDestinatario);
+        if(!existUserDestinatario){
+            errCode = 403;
+            throw new Error(" User destiny not found!");
+        }
         const buscaRemetente = data.client.filter((i)=>{
             return cpfRemetente === i.cpf
         })
@@ -219,8 +231,11 @@ app.put('/users/transferencia',(req:Request, res: Response)=>{
                 const transferencia = buscaDestinatario.map((i)=>{
                     let nSaldo = i.saldo + valorTransferencia
                     i.saldo = nSaldo
+                    const addPayAccount = func.addMovementAccount(data.client,dataTransferencia, "Transferencia de dinheiro", valorTransferencia,cpfDestinatario.toString())
                 })
                 i.saldo - valorTransferencia
+                const addPayAccount = func.addMovementAccount(data.client,dataTransferencia, "Transferencia de dinheiro", valorTransferencia,cpfRemetente.toString())
+
             }else{
                 const erro=new Error("Saldo insuficiente!");
                 erro.name="saldoInsuficiente";
