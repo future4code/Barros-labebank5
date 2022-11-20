@@ -11,3 +11,5 @@ Express, Typescript
 
 ## Endpoints:
 GET, POST, PUT
+
+## Exemplificação:
